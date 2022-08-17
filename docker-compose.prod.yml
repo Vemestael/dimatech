@@ -1,0 +1,53 @@
+version: "3"
+
+services:
+  django:
+    build:
+      context: .
+    container_name: django
+    command: bash -c "python manage.py migrate && python manage.py collectstatic --no-input &&  gunicorn config.wsgi:application --bind 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
+  nginx:
+    image: staticfloat/nginx-certbot
+    restart: unless-stopped
+    ports:
+      - "80:80/tcp"
+      - "443:443/tcp"
+    environment:
+      CERTBOT_EMAIL: example@mail.com
+    volumes:
+      - ./conf.d:/etc/nginx/user.conf.d:ro
+      - ./src/:/var/www/html
+      - ./data/letsencrypt:/etc/letsencrypt
+    depends_on:
+      - django
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: dimatech
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
