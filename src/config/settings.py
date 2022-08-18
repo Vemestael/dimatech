@@ -50,9 +50,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main.apps.MainConfig',
-    'rest_framework',
-    'django_filters',
-]
+    'rest_framework',  # Django Rest Framework
+    'django_filters',  # App for filter down a queryset based on a model’s fields
+    'djmoney',         # App to add support for Money fields in models and forms
+    ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -158,3 +159,8 @@ REST_FRAMEWORK = {
     ],
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
+
+# Django Money fields
+
+CURRENCIES = ('USD', 'EUR', 'RUB')
+CURRENCY_CHOICES = [('USD', 'USD $'), ('EUR', 'EUR €'), ('RUB', 'RUB ₽')]
