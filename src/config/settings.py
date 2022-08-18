@@ -42,18 +42,28 @@ CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS')
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+]
+
+PROJECT_APPS = [
     'main.apps.MainConfig',
+]
+
+THIRD_PARTY_APPS = [
     'rest_framework',  # Django Rest Framework
+    'rest_framework.authtoken',
     'django_filters',  # App for filter down a queryset based on a model’s fields
-    'djmoney',         # App to add support for Money fields in models and forms
-    ]
+    'djmoney',  # App to add support for Money fields in models and forms
+    'djoser',  # App provide REST implementation of Django authentication system
+]
+
+INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -158,9 +168,19 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend'
     ],
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
 }
 
 # Django Money fields
 
 CURRENCIES = ('USD', 'EUR', 'RUB')
 CURRENCY_CHOICES = [('USD', 'USD $'), ('EUR', 'EUR €'), ('RUB', 'RUB ₽')]
+
+# Django Rest auth
+
+SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('JWT',),
+}
