@@ -5,8 +5,8 @@ from main import views
 
 router = routers.DefaultRouter()
 router.register(r'product', views.ProductAPI)
-router.register(r'customer-bill', views.CustomerBillAPI)
-router.register(r'transaction', views.TransactionAPI)
+router.register(r'customer-bill', views.CustomerBillAPI, basename='customerbillmodel')
+router.register(r'transaction', views.TransactionAPI, basename='transactionmodel')
 router.register(r'auth/users', views.UserViewSet)
 
 urlpatterns = [

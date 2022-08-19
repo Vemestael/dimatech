@@ -21,7 +21,13 @@ class ProductAPI(ModelViewSet):
 
 
 class CustomerBillAPI(ModelViewSet):
-    queryset = models.CustomerBillModel.objects.all()
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return models.CustomerBillModel.objects.all()
+        else:
+            return models.CustomerBillModel.objects.filter(user_id=user.id)
+
     serializer_class = serializers.CustomerBillSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['user_id']
@@ -29,12 +35,29 @@ class CustomerBillAPI(ModelViewSet):
 
 
 class TransactionAPI(ModelViewSet):
-    queryset = models.TransactionModel.objects.all()
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return models.TransactionModel.objects.all()
+        else:
+            return models.TransactionModel.objects.filter(user_id=user.id)
+
     serializer_class = serializers.TransactionSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filterset_fields = ['user_id', 'bill_id']
 
 
 class UserViewSet(DjoserUserViewSet):
+    """
+    The class provides base endpoints for User creation and configuration
+    """
     def create(self, request, *args, **kwargs):
+        """
+        Overrides the User create function
+        Adding a change of account status to inactive and generating activation link
+
+        Return the activation link
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -46,14 +69,22 @@ class UserViewSet(DjoserUserViewSet):
 
         uid = utils.encode_uid(user.pk)
         token = default_token_generator.make_token(user)
-        data = {
-            "url": f'http://{request.get_host()}/auth/activate/{uid}/{token}'
-        }
+        data = {"url": f'http://{request.get_host()}/auth/activate/{uid}/{token}'}
         return Response(data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class UserActivationView(APIView):
+    """
+    Class provides a handler for activating the user's account with the link
+    """
     def get(self, request, uid, token):
+        """
+        The function processes the GET request,
+        which is sent automatically when you click on the link,
+        and makes a POST request to the endpoint to activate the user account.
+
+        Return activation status
+        """
         protocol = 'https://' if request.is_secure() else 'http://'
         web_url = protocol + request.get_host()
         post_url = web_url + "/auth/users/activation/"
