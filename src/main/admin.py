@@ -16,3 +16,8 @@ class CustomerBillAdmin(admin.ModelAdmin):
 @admin.register(models.TransactionModel)
 class TransactionAdmin(admin.ModelAdmin):
     list_display = ('id', 'user_id', 'bill_id', 'amount')
+
+
+@admin.register(models.PurchaseModel)
+class PurchaseAdmin(admin.ModelAdmin):
+    list_display = ('id', 'product_id', 'user_id', 'bill_id')

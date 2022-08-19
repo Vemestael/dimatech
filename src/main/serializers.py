@@ -1,10 +1,8 @@
-from django.contrib.auth import get_user_model
+from djoser.serializers import User
 from djoser.serializers import UserSerializer as DjoserUserSerializer
-from rest_framework.serializers import HyperlinkedModelSerializer
+from rest_framework.serializers import ModelSerializer, HiddenField, CurrentUserDefault
 
 import main.models as models
-
-User = get_user_model()
 
 
 class UserSerializer(DjoserUserSerializer):
@@ -14,23 +12,31 @@ class UserSerializer(DjoserUserSerializer):
         read_only_fields = ['id', 'username']
 
 
-class ProductSerializer(HyperlinkedModelSerializer):
+class ProductSerializer(ModelSerializer):
     class Meta:
         model = models.ProductModel
         fields = '__all__'
 
 
-class CustomerBillSerializer(HyperlinkedModelSerializer):
-    user_id = UserSerializer()
+class CustomerBillSerializer(ModelSerializer):
+    user_id = HiddenField(default=CurrentUserDefault())
 
     class Meta:
         model = models.CustomerBillModel
         fields = '__all__'
 
 
-class TransactionSerializer(HyperlinkedModelSerializer):
-    user_id = UserSerializer()
+class TransactionSerializer(ModelSerializer):
+    user_id = HiddenField(default=CurrentUserDefault())
 
     class Meta:
         model = models.TransactionModel
+        fields = '__all__'
+
+
+class PurchaseSerializer(ModelSerializer):
+    user_id = HiddenField(default=CurrentUserDefault())
+
+    class Meta:
+        model = models.PurchaseModel
         fields = '__all__'
