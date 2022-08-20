@@ -15,5 +15,6 @@ urlpatterns = [
     path('auth/', include('djoser.urls.authtoken')),
     path('auth/', include('djoser.urls.jwt')),
     path('auth/activate/<str:uid>/<str:token>/', views.UserActivationView.as_view()),
+    path('payment/webhook', views.transaction_webhook)
 ]
 urlpatterns += router.urls

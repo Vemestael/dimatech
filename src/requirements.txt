@@ -7,3 +7,4 @@ django-filter~=22.1
 django-money~=3.0.0
 requests~=2.25.1
 djoser~=2.1.0
+pycryptodome~=3.15.0

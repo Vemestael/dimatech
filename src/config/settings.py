@@ -33,6 +33,7 @@ env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.str('SECRET_KEY')
+SIGNING_KEY = env.str('SIGNING_KEY', SECRET_KEY)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.str('DEBUG')
@@ -187,14 +188,14 @@ DJOSER = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
     'UPDATE_LAST_LOGIN': False,
 
     'ALGORITHM': 'HS256',
-    'SIGNING_KEY': env.str('SIGNING_KEY', SECRET_KEY),
+    'SIGNING_KEY': SIGNING_KEY,
     'VERIFYING_KEY': None,
     'AUDIENCE': None,
     'ISSUER': None,
