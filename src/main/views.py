@@ -1,4 +1,3 @@
-import requests
 from Crypto.Hash import SHA1
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
@@ -8,11 +7,10 @@ from djmoney.money import Money
 from djoser import utils
 from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from config import settings
@@ -42,32 +40,24 @@ class UserViewSet(DjoserUserViewSet):
 
         uid = utils.encode_uid(user.pk)
         token = default_token_generator.make_token(user)
-        data = {"url": f'http://{request.get_host()}/auth/activate/{uid}/{token}'}
+        data = {"url": f'http://{request.get_host()}/auth/users/activate/{uid}/{token}'}
         return Response(data, status=status.HTTP_201_CREATED, headers=headers)
 
-
-class UserActivationView(APIView):
-    """
-    Class provides a handler for activating the user's account with the link
-    """
-
-    def get(self, request, uid, token):
+    @action(["get"], detail=False, url_path=r'activate/(?P<uid>[^/.]+)/(?P<token>[^/.]+)')
+    def activation(self, request, uid, token):
         """
-        Function processes the GET request,
-        which is sent automatically when you click on the link,
-        and makes a POST request to the endpoint to activate the user account.
+        Overrides the activation function, changing the endpoint and method from POST to GET
 
-        Return activation status
+        Returns activation status
         """
-        protocol = 'https://' if request.is_secure() else 'http://'
-        web_url = protocol + request.get_host()
-        post_url = web_url + "/auth/users/activation/"
-        post_data = {'uid': uid, 'token': token}
-        response = requests.post(post_url, data=post_data)
-        content = response.text
-        if response.status_code == status.HTTP_204_NO_CONTENT and not content:
-            content = "User is successfully activated"
-        return Response(content)
+        user_data = {'uid': uid, 'token': token}
+        serializer = self.get_serializer(data=user_data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.user
+        user.is_active = True
+        user.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ProductAPI(ModelViewSet):
@@ -95,6 +85,7 @@ class CustomerBillAPI(ModelViewSet):
     Provides filtering by the field "user_id"
     Provides search by the field "username"
     """
+
     def get_queryset(self):
         """
         Returns for user only with the data associated with him, if he is non admin user
@@ -118,6 +109,7 @@ class TransactionAPI(ModelViewSet):
     Has a read-only restriction for unauthorized users
     Provides filtering by "user_id" and "bill_id" fields
     """
+
     def get_queryset(self):
         """
         Returns for user only with the data associated with him, if he is non admin user
@@ -140,6 +132,7 @@ class PurchaseAPI(ModelViewSet):
     Has a read-only restriction for unauthorized users
     Provides filtering by "user_id" and "bill_id" fields
     """
+
     def get_queryset(self):
         """
         Returns for user only with the data associated with him, if he is non admin user

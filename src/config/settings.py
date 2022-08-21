@@ -59,6 +59,7 @@ PROJECT_APPS = [
 
 THIRD_PARTY_APPS = [
     'rest_framework',  # Django Rest Framework
+    'rest_framework.authtoken',  # Django Rest Framework authorization by token
     'django_filters',  # App for filter down a queryset based on a model’s fields
     'djmoney',  # App to add support for Money fields in models and forms
     'djoser',  # App provide REST implementation of Django authentication system
@@ -170,6 +171,7 @@ REST_FRAMEWORK = {
     ],
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',  # required to activate a user account
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
