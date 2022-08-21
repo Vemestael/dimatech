@@ -43,7 +43,7 @@ To use it, you must have a server and a domain configured
 
 2. Update the environment variables:
 
-    2.1.  In the docker-compose.yml variable "CERTBOT_EMAIL"
+    2.1.  In the docker-compose.prod.yml variable "CERTBOT_EMAIL"
 
     2.2. In the conf.d/nginx.conf variable "server_name"
     
@@ -95,19 +95,9 @@ To use the site, you have access to the main addresses:
    bill_id: int
    ```
 
-get */auth/users/* - for viewing users
+GET */auth/users/* - for viewing users
 
-post */auth/users/* - for creating users
-
-   ```
-   Required request fields for POST method
-   username: text
-   password: text
-   ```
-
-get */auth/users/activate/{uid}/{token}/* - for activating users
-
-post */auth/jwt/create/* - to create a jwt token
+POST */auth/users/* - for creating users
 
    ```
    Required request fields for POST method
@@ -115,7 +105,17 @@ post */auth/jwt/create/* - to create a jwt token
    password: text
    ```
 
-post */payment/webhook* - for sending webhook of transactions
+GET */auth/users/activate/{uid}/{token}/* - for activating users
+
+POST */auth/jwt/create/* - to create a jwt token
+
+   ```
+   Required request fields for POST method
+   username: text
+   password: text
+   ```
+
+POST */payment/webhook* - for sending webhook of transactions
 
    ```
    Required request fields for POST method
@@ -126,7 +126,7 @@ post */payment/webhook* - for sending webhook of transactions
    amount: float
    ```
 
-patch */auth/users/{id}/* - for editing users
+PATCH */auth/users/{id}/* - for editing users
    ```
    Request fields
    password: text
