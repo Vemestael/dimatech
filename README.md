@@ -31,6 +31,120 @@ This project provides you a working Django environment without requiring you to 
     $ docker-compose down
     ```
 
+## Site with ssl certificate
+
+To use it, you must have a server and a domain configured
+
+1. Create a nginx configuration file to handle ssl:
+    ```sh
+    $ mkdir conf.d
+    $ cp ./Docker/nginx/nginx.prod.conf ./conf.d/nginx.conf
+    ```
+
+2. Update the environment variables:
+
+    2.1.  In the docker-compose.yml variable "CERTBOT_EMAIL"
+
+    2.2. In the conf.d/nginx.conf variable "server_name"
+    
+    2.3 In the src/.env add variable "CSRF_TRUSTED_ORIGINS=https://your_web_site"
+
+3. Build the images and run the containers:
+     ```sh
+    $ docker-compose -f docker-compose.prod.yml up -d --build
+    ```
+
+4. You've done! Main page is available on https://your_web_site
+
+## Testing
+
+To use the site, you have access to the main addresses:
+
+*/* - home page
+
+*/product/* - for viewing and editing products
+
+   ```
+   Required request fields for POST method
+   title: text
+   description: text
+   price: float
+   ```
+
+*/customer-bill/* - to view and edit customer bills
+
+   ```
+   Required request fields for POST method
+   bill_balance: float
+   ```
+
+*/transaction/* - to view and edit transactions
+
+   ```
+   Required request fields for POST method
+   user_id: int
+   bill_id: int
+   amount: float
+   ```
+
+*/purchase/* - to view and edit purchases
+
+   ```
+   Required request fields for POST method
+   product_id: int
+   bill_id: int
+   ```
+
+get */auth/users/* - for viewing users
+
+post */auth/users/* - for creating users
+
+   ```
+   Required request fields for POST method
+   username: text
+   password: text
+   ```
+
+get */auth/users/activate/{uid}/{token}/* - for activating users
+
+post */auth/jwt/create/* - to create a jwt token
+
+   ```
+   Required request fields for POST method
+   username: text
+   password: text
+   ```
+
+post */payment/webhook* - for sending webhook of transactions
+
+   ```
+   Required request fields for POST method
+   signature: text
+   transaction_id: int
+   user_id: int
+   bill_id: int
+   amount: float
+   ```
+
+patch */auth/users/{id}/* - for editing users
+   ```
+   Request fields
+   password: text
+   email: int
+   is_active: bool - to enable/disable the user
+   ```
+
+*/admin/* - admin panel for interaction with the database tables
+
+**Note**: default users can view accounts, transactions and purchases associated with them. Administrators can view the data of all users
+
+To create an administrator account run the command
+   ```sh
+    $ docker-compose run django python manage.py createsuperuser
+   ```
+
+You can then grant administrator rights through the admin panel
+
 ## License
 
 This project is licensed under the [MIT license](LICENSE).
