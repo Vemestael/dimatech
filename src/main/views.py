@@ -124,6 +124,19 @@ class TransactionAPI(ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['user_id', 'bill_id']
 
+    def create(self, request, *args, **kwargs):
+        """
+        Extends the create function by adding changing bill balance
+        """
+        super().create(request, *args, **kwargs)
+
+        bill_obj = models.CustomerBillModel.objects.get(id=int(request.POST['bill_id']))
+        amount = Money(amount=request.POST['amount'], currency=bill_obj.bill_balance.currency)
+        bill_obj.bill_balance = bill_obj.bill_balance + amount
+        bill_obj.save()
+
+        return Response(status=status.HTTP_201_CREATED)
+
 
 class PurchaseAPI(ModelViewSet):
     """
